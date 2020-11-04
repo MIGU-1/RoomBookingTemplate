@@ -7,6 +7,30 @@
         MinHeight="300" MinWidth="300"
         Title="RoomBooking">
 
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="60"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">Room</TextBlock>
+        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Path=Rooms}" DisplayMemberPath="RoomNumber" SelectedValuePath="RoomNumber" SelectedItem="{Binding SelectedRoom}"></ComboBox>
+        <DataGrid Grid.Row="1" Grid.Column="1" IsReadOnly="True" ItemsSource="{Binding Bookings}" AutoGenerateColumns="False" SelectedItem="{Binding CurrentBooking}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="FROM" MinWidth="60" Binding="{Binding Path=From, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="TO" MinWidth="60" Binding="{Binding Path=To, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridTextColumn Header="CUSTOMER" Width="*" Binding="{Binding Path=Customer.FullName, UpdateSourceTrigger=PropertyChanged}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" Command="{Binding CmdEditCustomerCommand}" Content="{Binding Path=CurrentBooking.Customer.FullName}" ContentStringFormat="{}{0} BEARBEITEN!"/>
+    </Grid>
+    
 </controls:MetroWindow>
 
 

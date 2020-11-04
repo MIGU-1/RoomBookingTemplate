@@ -21,6 +21,8 @@ namespace RoomBooking.Wpf.Common
 
         MainViewModel _ => new MainWindow(),
 
+        EditCustomerViewModel _ => new EditCustomerWindow(),
+
         // default -> InvalidOperationException
         _ => throw new InvalidOperationException($"Unbekanntes ViewModel '{viewModel}'"),
       };
@@ -37,7 +39,6 @@ namespace RoomBooking.Wpf.Common
         window.Show();
       }
     }
-
     public void CloseWindow(BaseViewModel viewModel)
     {
       if (_windows.ContainsKey(viewModel))

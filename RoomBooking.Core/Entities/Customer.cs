@@ -9,8 +9,8 @@ namespace RoomBooking.Core.Entities
 
         [Required]
         public string LastName { get; set; }
-
         public string Iban { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
 
         public ICollection<Booking> Bookings { get; set; }
 
