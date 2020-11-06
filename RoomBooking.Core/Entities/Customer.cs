@@ -13,6 +13,7 @@ namespace RoomBooking.Core.Entities
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+
         public string FirstName
         {
             get => _firstName;

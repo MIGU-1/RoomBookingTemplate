@@ -1,5 +1,7 @@
-﻿using RoomBooking.Core.Contracts;
+﻿using MahApps.Metro.Controls;
+using RoomBooking.Core.Contracts;
 using RoomBooking.Core.Entities;
+using RoomBooking.Core.Validations;
 using RoomBooking.Persistence;
 using RoomBooking.Wpf.Common;
 using RoomBooking.Wpf.Common.Contracts;
@@ -16,6 +18,9 @@ namespace RoomBooking.Wpf.ViewModels
     {
         private Customer _customer;
         private Customer _undoCustomer;
+        private string _firstName;
+        private string _lastName;
+        private string _iban;
         public Customer Customer
         {
             get => _customer;
@@ -23,11 +28,49 @@ namespace RoomBooking.Wpf.ViewModels
             {
                 _customer = value;
                 OnPropertyChanged(nameof(Customer));
+                Validate();
+            }
+        }
+        
+        [MinLength(2, ErrorMessage = "Der Vorname muss mindestens 2. Zeichen lang sein!")]
+        [MaxLength(50, ErrorMessage = "Der Vorname darf max 50. Zeichen lang sein!")]
+        public string FirstName
+        {
+            get => _firstName;
+            set
+            {
+                _firstName = value;
+                OnPropertyChanged(nameof(FirstName));
+                Validate();
+            }
+        }
+        public string LastName
+        {
+            get => _lastName;
+            set
+            {
+                _lastName = value;
+                OnPropertyChanged(nameof(LastName));
+                Validate();
+            }
+        }
+        public string Iban
+        {
+            get => _iban;
+            set
+            {
+                _iban = value;
+                OnPropertyChanged(nameof(Iban));
+                Validate();
             }
         }
         public EditCustomerViewModel(IWindowController windowController, Customer customer) : base(windowController)
         {
             Customer = customer;
+            FirstName = customer.FirstName;
+            LastName = customer.LastName;
+            Iban = customer.Iban;
+
             _undoCustomer = new Customer
             {
                 FirstName = customer.FirstName,
@@ -46,9 +89,9 @@ namespace RoomBooking.Wpf.ViewModels
                     _cmdUndoCommand = new RelayCommand(
                         execute: _ =>
                         {
-                            Customer.FirstName = _undoCustomer.FirstName;
-                            Customer.LastName = _undoCustomer.LastName;
-                            Customer.Iban = _undoCustomer.Iban;
+                            FirstName = _undoCustomer.FirstName;
+                            LastName = _undoCustomer.LastName;
+                            Iban = _undoCustomer.Iban;
 
                         },
                         canExecute: _ => Customer != _undoCustomer);
@@ -71,6 +114,9 @@ namespace RoomBooking.Wpf.ViewModels
                         execute: async _ =>
                         {
                             using IUnitOfWork uow = new UnitOfWork();
+                            Customer.FirstName = FirstName;
+                            Customer.LastName = LastName;
+                            Customer.Iban = Iban;
                             uow.Customers.Update(Customer);
                             await uow.SaveAsync();
                             Controller.CloseWindow(this);
@@ -86,7 +132,10 @@ namespace RoomBooking.Wpf.ViewModels
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new NotImplementedException();
+            if(!IbanChecker.CheckIban(Iban))
+            {
+                yield return new ValidationResult($"Iban nicht gültig!", new string[] { nameof(Iban) });
+            }
         }
     }
 }
