@@ -101,14 +101,18 @@ namespace RoomBooking.Wpf.ViewModels
         }
 
         private ICommand _cmdEditCustomerCommand;
-        public ICommand CmdEditCustomerCommand 
-        { 
+        public ICommand CmdEditCustomerCommand
+        {
             get
             {
-                if(_cmdEditCustomerCommand == null)
+                if (_cmdEditCustomerCommand == null)
                 {
                     _cmdEditCustomerCommand = new RelayCommand(
-                        execute: _ => Controller.ShowWindow(new EditCustomerViewModel(Controller, CurrentBooking.Customer), true),
+                        execute: _ =>
+                        {
+                            Controller.ShowWindow(new EditCustomerViewModel(Controller, CurrentBooking.Customer), true);
+                            LoadDataAsync();
+                        },
                         canExecute: _ => CurrentBooking != null
                         );
                 }
