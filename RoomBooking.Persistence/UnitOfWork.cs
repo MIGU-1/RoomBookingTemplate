@@ -73,7 +73,7 @@ namespace RoomBooking.Persistence
                     c.Id != customer.Id)
                     .ToArrayAsync();
 
-                if (customer != null)
+                if (customers != null)
                 {
                     throw new ValidationException($"Es gibt bereits einen Kunden mit dem Namen {customer.LastName} {customer.FirstName}");
                 }
@@ -94,6 +94,7 @@ namespace RoomBooking.Persistence
                 .Where(entity => entity.State == EntityState.Added
                                  || entity.State == EntityState.Modified)
                 .Select(e => e.Entity);
+
             foreach (var entity in entities)
             {
                 await ValidateEntityAsync(entity);

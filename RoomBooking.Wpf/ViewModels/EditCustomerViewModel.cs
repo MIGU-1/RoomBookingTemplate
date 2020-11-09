@@ -31,7 +31,7 @@ namespace RoomBooking.Wpf.ViewModels
                 Validate();
             }
         }
-        
+
         [MinLength(2, ErrorMessage = "Der Vorname muss mindestens 2. Zeichen lang sein!")]
         [MaxLength(50, ErrorMessage = "Der Vorname darf max 50. Zeichen lang sein!")]
         public string FirstName
@@ -113,13 +113,32 @@ namespace RoomBooking.Wpf.ViewModels
                     _cmdSaveCommand = new RelayCommand(
                         execute: async _ =>
                         {
-                            using IUnitOfWork uow = new UnitOfWork();
-                            Customer.FirstName = FirstName;
-                            Customer.LastName = LastName;
-                            Customer.Iban = Iban;
-                            uow.Customers.Update(Customer);
-                            await uow.SaveAsync();
-                            Controller.CloseWindow(this);
+                            Validate();
+
+                            try
+                            {
+                                using IUnitOfWork uow = new UnitOfWork();
+                                Customer.FirstName = FirstName;
+                                Customer.LastName = LastName;
+                                Customer.Iban = Iban;
+                                uow.Customers.Update(Customer);
+                                await uow.SaveAsync();
+                                Controller.CloseWindow(this);
+                            }
+                            catch(ValidationException ex)
+                            {
+                                if(ex.Value is IEnumerable<string> properties)
+                                {
+                                    foreach(var property in properties)
+                                    {
+                                        Errors.Add(property, new List<string> { ex.ValidationResult.ErrorMessage });
+                                    }
+                                }
+                                else
+                                {
+                                    DbError = ex.ValidationResult.ToString();
+                                }
+                            }
                         },
                         canExecute: _ => Customer != null);
                 }
@@ -132,7 +151,7 @@ namespace RoomBooking.Wpf.ViewModels
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if(!IbanChecker.CheckIban(Iban))
+            if (!IbanChecker.CheckIban(Iban))
             {
                 yield return new ValidationResult($"Iban nicht gültig!", new string[] { nameof(Iban) });
             }
